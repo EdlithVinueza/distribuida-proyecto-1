@@ -5,14 +5,17 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="25" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app-authors" />
+            <option value="$PROJECT_DIR$/app-books" />
+            <option value="$PROJECT_DIR$/app-customers" />
             <option value="$PROJECT_DIR$/web01" />
             <option value="$PROJECT_DIR$/web02" />
           </set>
         </option>
-        <option name="myGradleHome" value="" />
       </GradleProjectSettings>
     </option>
   </component>
