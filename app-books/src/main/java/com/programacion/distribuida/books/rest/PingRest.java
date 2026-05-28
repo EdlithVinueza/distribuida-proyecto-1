@@ -1,12 +1,12 @@
-package com.programacion.distribuida.authors.rest;
+package com.programacion.distribuida.books.rest;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 
+@Path("/ping")
 public class PingRest {
 
     @GET
-    @Path("/ping")
     public String ping(){
         return "pong";
 

@@ -4,7 +4,7 @@ import com.programacion.distribuida.books.clients.AuthorRestClient;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
-import jakarta.resource.spi.ConfigProperty;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 @ApplicationScoped
@@ -22,5 +22,7 @@ public class RestClienProducers {
                 .build(AuthorRestClient.class);
     }
 }
+
+//Esta es la forma primitiva de hacer la llamda a cliente
 
 

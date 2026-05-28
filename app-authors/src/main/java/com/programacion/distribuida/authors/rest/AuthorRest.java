@@ -46,6 +46,7 @@ public class AuthorRest {
     public List<AuthorDto> findByBook(@PathParam("isbn") String isbn) {
         return authorRepository.findByBook(isbn)
                 .stream()
+                .peek(it-> it.setName(it.getName() + " - " + port))
                 .map(it -> AuthorDto.builder()
                         .id(it.getId())
                         .name(it.getName())

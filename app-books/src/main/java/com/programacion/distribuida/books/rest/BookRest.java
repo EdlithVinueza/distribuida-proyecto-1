@@ -5,25 +5,32 @@ import com.programacion.distribuida.books.db.Inventory;
 import com.programacion.distribuida.books.repo.BookRepository;
 import com.programacion.distribuida.books.clients.AuthorRestClient;
 import com.programacion.distribuida.books.dtos.BookDto;
-import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import jakarta.transaction.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @Path("/books")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RequiredArgsConstructor
 @Transactional
+@ApplicationScoped
 public class BookRest {
 
-    final BookRepository bookRepository;
+    private final BookRepository bookRepository;
+    private final AuthorRestClient client;
+
+    @Inject
+    public BookRest(BookRepository bookRepository, @RestClient AuthorRestClient client) {
+        this.bookRepository = bookRepository;
+        this.client = client;
+    }
 
     @GET
     @Path("/{isbn}")
@@ -37,14 +44,13 @@ public class BookRest {
                             .inventorySold(Optional.ofNullable(book.getInventory()).map(Inventory::getSold).orElse(null))
                             .inventorySupplied(Optional.ofNullable(book.getInventory()).map(Inventory::getSupplied).orElse(null))
                             .build();
+
                     try {
-                        AuthorRestClient client = RestClientBuilder.newBuilder()
-                                .baseUri(URI.create("http://127.0.0.1:8070"))
-                                .build(AuthorRestClient.class);
                         dto.setAuthors(client.findByBook(isbn));
                     } catch (Exception e) {
                         dto.setAuthors(List.of());
                     }
+
                     return dto;
                 })
                 .map(Response::ok)
@@ -52,16 +58,23 @@ public class BookRest {
                 .build();
     }
 
+    // Método actualizado
     @GET
     public List<BookDto> findAll() {
-        return bookRepository.listAll().stream()
-                .map(it -> BookDto.builder()
-                        .isbn(it.getIsbn())
-                        .title(it.getTitle())
-                        .price(it.getPrice())
-                        .inventorySold(Optional.ofNullable(it.getInventory()).map(Inventory::getSold).orElse(null))
-                        .inventorySupplied(Optional.ofNullable(it.getInventory()).map(Inventory::getSupplied).orElse(null))
-                        .build())
+        return bookRepository.streamAll()
+                .map(book -> {
+                    // Consultar los autores en http://127.0.0.1:8070
+                    var authors = client.findByBook(book.getIsbn());
+
+                    return BookDto.builder()
+                            .isbn(book.getIsbn())
+                            .title(book.getTitle())
+                            .price(book.getPrice())
+                            .authors(authors)
+                            .inventorySold(book.getInventory() != null ? book.getInventory().getSold() : null)
+                            .inventorySupplied(book.getInventory() != null ? book.getInventory().getSupplied() : null)
+                            .build();
+                })
                 .toList();
     }
 

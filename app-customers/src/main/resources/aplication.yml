@@ -1,0 +1,10 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: app-customers
+  cloud: # <-- Movido dos espacios a la izquierda para alinearse con application
+    consul:
+      host: localhost
+      port: 8500
+

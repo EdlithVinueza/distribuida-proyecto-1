@@ -11,10 +11,10 @@ repositories {
     mavenCentral()
 }
 
-// Configuración de Java 21 (Recomendado para Quarkus 3.x)
+
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -33,6 +33,10 @@ dependencies {
 
     implementation("io.quarkus:quarkus-flyway")
     runtimeOnly("org.flywaydb:flyway-database-postgresql:12.5.0")
+
+    implementation("io.quarkus:quarkus-smallrye-stork")
+    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-consul-client")
+
 }
 
 tasks.test {

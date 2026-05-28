@@ -1,8 +1,9 @@
-package com.programacion.distribuida.books;
+package com.programacion.distribuida.authors;
 
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import io.vertx.core.Vertx;
+import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.ConsulClient;
 import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ServiceOptions;
@@ -31,7 +32,7 @@ public class AuthorsLifecycle {
 
     // Guardamos el cliente a nivel de clase para poder usarlo en el método destroy()
     private ConsulClient client;
-    private String serviceId;
+    private String serviceId; //debe ser unico por intancias
 
     public void init(@Observes StartupEvent event, Vertx vertx) {
         System.out.println("authors-lifecycle: init");
@@ -46,13 +47,26 @@ public class AuthorsLifecycle {
             String ipAddress = InetAddress.getLocalHost().getHostAddress();
 
             // CORREGIDO: Usamos %d ya que ambos parámetros son enteros (Integer)
-            this.serviceId = "app-authors-%d:%d".formatted(appPort, appPort);
+            this.serviceId = "app-authors-%s:%d".formatted(appPort, appPort);
+
+            var urlCheck = "http://%s:%d/ping".formatted(ipAddress, appPort);
+
+            CheckOptions checkOptions = new CheckOptions()
+                    .setHttp(urlCheck)
+                    .setInterval("10s")
+                    .setDeregisterAfter("10s");
 
             ServiceOptions serviceOptions = new ServiceOptions()
                     .setName("app-authors")
                     .setId(serviceId)
-                    .setAddress(ipAddress) // APLICADO: Ahora sí usa la IP dinámica en vez de "localhost"
-                    .setPort(appPort);
+                    .setAddress(ipAddress)
+                    .setPort(appPort)
+                    .setCheckOptions(checkOptions);
+
+            client.registerService(serviceOptions)
+                    .onSuccess(it -> System.out.println("Authors service registered in Consul with ID: " + serviceId));
+
+
 
             // CORREGIDO: Eliminados los tipos 'Void' y 'Throwable' de las lambdas para solucionar tus errores
             this.client.registerService(serviceOptions)

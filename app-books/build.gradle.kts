@@ -11,7 +11,6 @@ repositories {
     mavenCentral()
 }
 
-// Configuración de Java 21 (Recomendado para Quarkus 3.x)
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
@@ -33,8 +32,19 @@ dependencies {
     implementation("io.quarkus:quarkus-rest-client-jsonb")
 
     //Discovery
-    //implementation("io.quarkus:quarkus-smallrye-stork")
-    //implementation("io.smallrye.stork:stork-service-discovery-static-list:2.6.3")
+    implementation("io.quarkus:quarkus-smallrye-stork")
+    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-consul-client")
+
+    //no dinamico
+    //implementation("io.smallrye.stork:stork-service-discovery-static-list")
+
+    //dinamico
+    implementation("io.smallrye.stork:stork-service-discovery-consul")
+
+
+
+
+    //implementation("org.modelmapper:modelmapper:3.2.6")
 
 
 

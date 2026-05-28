@@ -1,6 +1,8 @@
 plugins {
     id("java")
-    id("io.quarkus") version "3.35.2"
+    // 1. Plugins oficiales de Spring Boot y gestión de dependencias instalados
+    id("org.springframework.boot") version "4.0.6"
+    id("io.spring.dependency-management") version "1.1.7"
     id("io.freefair.lombok") version "9.2.0"
 }
 
@@ -18,18 +20,16 @@ java {
     }
 }
 
+// Declaración correcta de la propiedad extra para Spring Cloud
+extra["springCloudVersion"] = "2025.0.2"
+
 dependencies {
-
-    implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:3.35.2"))
-
-    implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-rest")
-    implementation("io.quarkus:quarkus-rest-jsonb")
-    implementation("io.quarkus:quarkus-hibernate-orm-panache")
-    implementation("io.quarkus:quarkus-jdbc-postgresql")
-
-
+    // Bloque Spring Web, Discovery y Actuator heredando versiones automáticamente
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
+
 
 tasks.test {
     useJUnitPlatform()
