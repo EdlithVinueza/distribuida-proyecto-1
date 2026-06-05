@@ -57,8 +57,14 @@ public class AuthorsLifecycle {
                     .setInterval("10s")
                     .setDeregisterAfter("10s");
 
+            //metadatos para Traefik, para que pueda enrutar correctamente el tráfico a este servicio
+            //pasamos las etiquetas necesarias para que Traefik pueda enrutar correctamente el tráfico a este servicio
+            //las etiquetas venian priginalmente en app-static.yml de traefik
             var tags= List.of(
-                    "traefik.enable=true"
+                    "traefik.enable=true",
+                    "traefik.http.routers.app-authors.rule=PathPrefix(`/app-authors`)",
+                    "traefik.http.routers.router-app-authors.middlewares=middleware-authors",
+                    "traefik.http.middlewares.middleware-authors.stripprefix.prefixes=/app-authors"
             );
 
             ServiceOptions serviceOptions = new ServiceOptions()
@@ -71,8 +77,6 @@ public class AuthorsLifecycle {
 
             client.registerService(serviceOptions)
                     .onSuccess(it -> System.out.println("Authors service registered in Consul with ID: " + serviceId));
-
-
 
             // CORREGIDO: Eliminados los tipos 'Void' y 'Throwable' de las lambdas para solucionar tus errores
             this.client.registerService(serviceOptions)

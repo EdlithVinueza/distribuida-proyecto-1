@@ -71,12 +71,20 @@ function App() {
 
             <br />
             {
-                books.map(book =>
-                <p key={book.isbn}>{book.isbn} - {book.price} - {book.title} - {(book.authors || []).map(a => a.name).join(', ')}</p>
-                )
+                books.map((book: Book) => (
+                        <ul key={book.isbn}>
+                            <li>{book.isbn} - {book.title}</li>
+                            {/* Sublista para los autores */}
+                            <ul>
+                                {book.authors.map((author: Author) => (
+                                        <li key={author.name}>{author.name}</li>
+                                ))}
+                            </ul>
+                        </ul>
+                ))
             }
-
         </section>
+
 
 
         <br/>

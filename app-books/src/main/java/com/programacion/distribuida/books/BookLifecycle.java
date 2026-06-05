@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.net.InetAddress;
+import java.util.List;
 
 public class BookLifecycle {
     @Inject
@@ -52,13 +53,20 @@ public class BookLifecycle {
                     .setHttp(urlCheck)
                     .setInterval("10s")
                     .setDeregisterAfter("10s");
+            var tags= List.of(
+                    "traefik.enable=true",
+                    "traefik.http.routers.app-books.rule=PathPrefix(`/app-books`)",
+                    "traefik.http.routers.router-app-books.middlewares=middleware-books",
+                    "traefik.http.middlewares.middleware-books.stripprefix.prefixes=/app-books"
+            );
 
             ServiceOptions serviceOptions = new ServiceOptions()
                     .setName("app-books")
                     .setId(serviceId)
                     .setAddress(ipAddress) // APLICADO: Ahora sí usa la IP dinámica en vez de "localhost"
                     .setPort(appPort)
-                    .setCheckOptions(checkOptions);
+                    .setCheckOptions(checkOptions)
+                    .setTags(tags);
 
             // CORREGIDO: Eliminados los tipos 'Void' y 'Throwable' de las lambdas para solucionar tus errores
             this.client.registerService(serviceOptions)
