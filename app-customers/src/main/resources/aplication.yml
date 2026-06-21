@@ -3,15 +3,21 @@ server:
 spring:
   application:
     name: app-customers
-  cloud: # <-- Movido dos espacios a la izquierda para alinearse con application
+  config:
+    import: "optional:consul:"
+  datasource:
+    url: jdbc:postgresql://localhost:5432/books20262026
+    username: postgres
+    password: 'labcom,2015'
+    driver-class-name: org.postgresql.Driver
+  cloud:
     consul:
       host: localhost
       port: 8500
       discovery:
         tags:
-            - framework=springboot-4.0.6
-            - traefik.enable=true
-            - traefik.http.routers.router-app-customers.rule=PathPrefix(`/app-customers`)
-            - traefik.http.routers.router-app-customers.middlewares=middleware-customers
-            - traefik.http.middlewares.middleware-customers.stripprefix.prefixes=/app-customers
-
+          - framework=springboot-4.0.6
+          - traefik.enable=true
+          - traefik.http.routers.router-app-customers.rule=PathPrefix(`/app-customers`)
+          - traefik.http.routers.router-app-customers.middlewares=middleware-customers
+          - traefik.http.middlewares.middleware-customers.stripprefix.prefixes=/app-customers

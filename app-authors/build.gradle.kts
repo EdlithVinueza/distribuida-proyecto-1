@@ -37,6 +37,8 @@ dependencies {
     implementation("io.quarkus:quarkus-smallrye-stork")
     implementation("io.smallrye.reactive:smallrye-mutiny-vertx-consul-client")
 
+    //-- Resiliencia
+    implementation("io.quarkus:quarkus-smallrye-fault-tolerance")
 }
 
 tasks.test {

@@ -1,7 +1,7 @@
 @echo off
 title App Authors Cluster
 
-cd /d "C:\Users\edlit\OneDrive\Documentos\2026-2026\Programacion Ditribuida\distribuida-proyecto-1\app-authors"
+cd /d "C:\Users\Edlith Vinueza\Documents\UCE 26-26\Distribuida\distribuida-proyecto-1\app-authors"
 
 start "AUTH-8070" cmd /k java -Dquarkus.http.port=8070 -jar build/quarkus-app/quarkus-run.jar
 

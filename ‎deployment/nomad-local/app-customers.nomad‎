@@ -3,21 +3,33 @@ job "book-store" {
 
   group "servers" {
 
-    count = 4
+    count = 2
 
     network {
       port "http" {}
     }
 
     task "app-customers" {
-      driver = "java"
-      config {
+      driver = "raw_exec"
 
-        jar_path = "/home/edlith/Documentos/UCE 2026-2026/Proyectos Programacion Distriuida/distribuida-proyecto-1/app-customers/app-customers-0.0.1-SNAPSHOT.jar"
-        jvm_options = ["-Xmx1024m", "-Xms128m"]
+      artifact {
+        source      = "https://github.com/EdlithVinueza/distribuida-proyecto-1/releases/download/v1.0.0/app-customers-1.0-SNAPSHOT.zip"
+        destination = "local/"
+        mode        = "any"
       }
+
+      config {
+        # Ejecuta unzip y luego el jar. Requiere /bin/sh, unzip y java en PATH en el Nomad client.
+        command = "/bin/sh"
+        args = [
+          "-c",
+          "unzip -o local/app-customers-1.0-SNAPSHOT.zip -d local && java -Xmx1024m -Xms128m -jar local/app-customers-1.0-SNAPSHOT.jar"
+        ]
+      }
+
       env {
-        SERVER_PORT = "${NOMAD_PORT_http}"
+        SERVER_PORT              = "${NOMAD_PORT_http}"
+        SPRING_CLOUD_CONSUL_HOST = "192.168.224.20"
       }
 
       service {
