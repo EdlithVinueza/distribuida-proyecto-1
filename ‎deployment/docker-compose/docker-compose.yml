@@ -1,4 +1,4 @@
-﻿name: books-app
+name: books-app
 services:
   db-server:
     image: postgres:17.10-alpine3.24
@@ -83,3 +83,14 @@ services:
     depends_on:
       - db-server
       - consul
+  web:
+    build:
+      context: ../../app-web
+      dockerfile: Dockerfile.jvm
+    container_name: web-app
+    ports:
+      - "80:80"
+    depends_on:
+      - authors
+      - books
+      - customers
