@@ -14,7 +14,7 @@ services:
       POSTGRES_PASSWORD: labcom,2015
       POSTGRES_DB: books20262026
     volumes:
-      - "/home/edlith/tools/distribuida2626/db:/var/lib/postgresql/data"
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     restart: unless-stopped
@@ -44,6 +44,12 @@ services:
       - 9090:9090
     restart: unless-stopped
 
+  grafana:
+    image: grafana/grafana
+    ports:
+     - 3000:3000
+    networks:
+     - telemetria-net
   authors:
     build:
       context: ../../app-authors
