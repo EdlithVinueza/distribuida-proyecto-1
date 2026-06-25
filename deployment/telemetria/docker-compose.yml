@@ -1,0 +1,115 @@
+name: telemetria
+
+networks:
+  telemetria-net:
+    driver: bridge
+
+services:
+  db-server:
+    image: postgres:17.10-alpine3.24
+    networks:
+      - telemetria-net
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: labcom,2015
+      POSTGRES_DB: books20262026
+    volumes:
+      - "/home/edlith/tools/distribuida2626/db:/var/lib/postgresql/data"
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
+
+  consul:
+    image: hashicorp/consul:1.20
+    networks:
+      - telemetria-net
+    command: agent -server -bootstrap -ui -node=consul -client=0.0.0.0
+    ports:
+      - 8500:8500
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    networks:
+      - telemetria-net
+    volumes:
+      - ./configs:/etc/prometheus
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+
+  authors:
+    build:
+      context: ../../app-authors
+      dockerfile: src/main/docker/Dockerfile.jvm
+    container_name: authors-app
+    networks:
+      - telemetria-net
+    environment:
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://db-server:5432/books20262026
+      QUARKUS_DATASOURCE_USERNAME: postgres
+      QUARKUS_DATASOURCE_PASSWORD: labcom,2015
+      QUARKUS_HTTP_PORT: 8080
+      QUARKUS_HOST: consul
+      CONSUL_PORT: 8500
+    ports:
+      - 8070:8080
+    expose:
+      - 8080
+    restart: unless-stopped
+    depends_on:
+      - db-server
+      - consul
+
+  books:
+    build:
+      context: ../../app-books
+      dockerfile: src/main/docker/Dockerfile.jvm
+    container_name: books-app
+    networks:
+      - telemetria-net
+    environment:
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://db-server:5432/books20262026
+      QUARKUS_DATASOURCE_USERNAME: postgres
+      QUARKUS_DATASOURCE_PASSWORD: labcom,2015
+      QUARKUS_HTTP_PORT: 8080
+      QUARKUS_HOST: consul
+      QUARKUS_PORT: 8500
+    ports:
+      - 8071:8080
+    expose:
+      - 8080
+    restart: unless-stopped
+    depends_on:
+      - db-server
+      - consul
+
+  customers:
+    build:
+      context: ../../app-customers
+      dockerfile: src/main/docker/Dockerfile.jvm
+    container_name: customers-app
+    networks:
+      - telemetria-net
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-server:5432/books20262026
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: labcom,2015
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      SERVER_PORT: "8090"
+    ports:
+      - 8091:8090
+    restart: unless-stopped
+    depends_on:
+      - db-server
+      - consul
+
+volumes:
+  postgres_data: {}

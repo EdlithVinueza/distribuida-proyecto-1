@@ -1,0 +1,17 @@
+# Construir las imágenes
+docker compose build
+
+# Levantar los contenedores (crearlos y arrancarlos en segundo plano)
+docker compose up -d
+
+# Detener los contenedores SIN eliminarlos (mantienen su estado)
+docker compose stop
+
+# Volver a levantar contenedores que solo fueron detenidos con el comando anterior
+docker compose start
+
+# Detener y eliminar los contenedores (y las redes creadas por docker compose)
+docker compose down
+
+# Construir las imágenes y levantar los contenedores desde cero en un solo paso
+docker compose up -d --build

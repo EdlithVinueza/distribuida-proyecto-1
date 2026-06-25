@@ -44,11 +44,8 @@ dependencies {
     //-- Resiliencia
     implementation("io.quarkus:quarkus-smallrye-fault-tolerance")
 
-
-
-    //implementation("org.modelmapper:modelmapper:3.2.6")
-
-
+    //-- Metricas Prometheus
+    implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
 
 }
 

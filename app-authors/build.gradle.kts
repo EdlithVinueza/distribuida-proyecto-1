@@ -39,6 +39,9 @@ dependencies {
 
     //-- Resiliencia
     implementation("io.quarkus:quarkus-smallrye-fault-tolerance")
+
+    //-- Metricas Prometheus
+    implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
 }
 
 tasks.test {
