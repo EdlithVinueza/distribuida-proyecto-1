@@ -1,5 +1,6 @@
 server:
   port: 8090
+
 spring:
   application:
     name: app-customers
@@ -12,12 +13,29 @@ spring:
     driver-class-name: org.postgresql.Driver
   cloud:
     consul:
-      host: localhost
-      port: 8500
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
+      port: ${SPRING_CLOUD_CONSUL_PORT:8500}
       discovery:
+        enabled: true
+        register: true
         tags:
           - framework=springboot-4.0.6
           - traefik.enable=true
           - traefik.http.routers.router-app-customers.rule=PathPrefix(`/app-customers`)
           - traefik.http.routers.router-app-customers.middlewares=middleware-customers
           - traefik.http.middlewares.middleware-customers.stripprefix.prefixes=/app-customers
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

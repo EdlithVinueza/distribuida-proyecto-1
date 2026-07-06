@@ -50,6 +50,7 @@ services:
      - 3000:3000
     networks:
      - telemetria-net
+
   authors:
     build:
       context: ../../app-authors
@@ -62,7 +63,7 @@ services:
       QUARKUS_DATASOURCE_USERNAME: postgres
       QUARKUS_DATASOURCE_PASSWORD: labcom,2015
       QUARKUS_HTTP_PORT: 8080
-      QUARKUS_HOST: consul
+      CONSUL_HOST: consul
       CONSUL_PORT: 8500
     ports:
       - 8070:8080
@@ -85,8 +86,8 @@ services:
       QUARKUS_DATASOURCE_USERNAME: postgres
       QUARKUS_DATASOURCE_PASSWORD: labcom,2015
       QUARKUS_HTTP_PORT: 8080
-      QUARKUS_HOST: consul
-      QUARKUS_PORT: 8500
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
     ports:
       - 8071:8080
     expose:
@@ -116,6 +117,38 @@ services:
     depends_on:
       - db-server
       - consul
+
+  proxy:
+    image: traefik:3.7.5
+    networks:
+      - telemetria-net
+    depends_on:
+      - consul
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--entryPoints.http.address=:80"
+      - "--entryPoints.traefik.address=:8080"
+      - "--entryPoints.metrics.address=:8082"
+      - "--providers.consulCatalog"
+      - "--providers.consulCatalog.endpoint.address=consul:8500"
+      - "--providers.consulCatalog.exposedByDefault=false"
+      - "--providers.consulCatalog.refreshInterval=5s"
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entryPoint=metrics"
+    ports:
+      - 8888:8080
+      - 8080:80
+      - 8082:8082
+
+  postgresql-exporter:
+    image: prometheuscommunity/postgres-exporter
+    networks:
+      - telemetria-net
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:labcom,2015@db-server:5432/books20262026?sslmode=disable"
+    ports:
+      - 9187:9187
 
 volumes:
   postgres_data: {}
