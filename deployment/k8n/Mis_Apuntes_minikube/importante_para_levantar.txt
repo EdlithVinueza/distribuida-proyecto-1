@@ -1,0 +1,72 @@
+====================================================================
+GUÍA DEFINITIVA: CÓMO LEVANTAR EL PROYECTO EN KUBERNETES (MINIKUBE)
+====================================================================
+
+REQUISITOS PREVIOS MUY IMPORTANTES:
+
+1. Imágenes en Docker Hub (Nube): 
+   Antes de ejecutar cualquier archivo de Kubernetes, TODAS tus imágenes 
+   (app-authors, app-books, app-customers) DEBEN haber sido construidas y 
+   subidas a tu cuenta de Docker Hub (usuario: eavz777). 
+   Minikube va a ir a internet a descargarlas. Si no están ahí, el despliegue fallará.
+
+2. Archivos YAML Completos:
+   Debes tener un archivo de despliegue (.yml) por cada microservicio.
+   Asegúrate de que dentro del YAML de cada app, la propiedad "image" apunte a tu usuario.
+   Ejemplo: image: eavz777/app-authors:latest
+
+
+====================================================================
+EL ORDEN ESTRICTO DE DESPLIEGUE
+====================================================================
+La regla de oro es: "Infraestructura primero, aplicaciones después".
+Abre tu terminal en la carpeta 'deployment/k8n' y ejecuta en este orden:
+
+--- PASO 1: INFRAESTRUCTURA Y DATOS ---
+kubectl apply -f postgresql-deployment.yml
+kubectl apply -f consul-deployment.yml
+(Espera unos 15 segundos para que la base de datos se inicialice correctamente)
+
+--- PASO 2: APLICACIONES (TUS MICROSERVICIOS) ---
+kubectl apply -f app-authors-deployment.yml
+kubectl apply -f app-books-deployment.yml       <-- (Cuando lo tengas creado)
+kubectl apply -f app-customers-deployment.yml   <-- (Cuando lo tengas creado)
+
+💡 NOTA IMPORTANTE SOBRE LA BASE DE DATOS (FLYWAY):
+La base de datos nace vacía. Pero al levantar tus aplicaciones en este paso, 
+la variable QUARKUS_FLYWAY_MIGRATE_AT_START=true hará que Flyway se conecte, 
+ejecute tus archivos .sql y llene las tablas de forma automática ANTES 
+de que el microservicio empiece a recibir tráfico. No debes hacer nada manual.
+
+--- PASO 3: ENRUTAMIENTO Y RED (INGRESS) ---
+kubectl apply -f traefik-deployment.yml
+kubectl apply -f nginx-deplyment.yml
+
+
+====================================================================
+HERRAMIENTAS: MINIKUBE Y HEADLAMP
+====================================================================
+
+- Para encender tu clúster local (Haz esto ANTES de usar los comandos kubectl):
+  minikube start --memory=4096 --cpus=2
+
+- Para abrir la interfaz gráfica y monitorear que todos tus Pods digan "Running":
+  flatpak run io.kinvolk.Headlamp
+  (Al abrir, selecciona el clúster llamado "minikube" y ve a la sección "Pods")
+
+- Para apagar el clúster cuando termines de trabajar (para no gastar RAM):
+  minikube stop
+
+
+====================================================================
+CÓMO VER LA BASE DE DATOS DESDE INTELLIJ
+====================================================================
+Para interactuar con la base de datos de Minikube (que está aislada):
+
+1. Abre el archivo postgresql-deployment.yml en IntelliJ.
+2. Al lado de la línea "containerPort: 5432" aparecerá un ícono de enchufe ("Forward Ports").
+3. Haz clic ahí y pon el puerto local "5433" (para que no choque con tu base local).
+4. Dale a "Forward". ¡IntelliJ creará el túnel por ti!
+5. Crea una nueva conexión en la pestaña Database apuntando a localhost:5433.
+
+kubectl port-forward svc/postgres 5433:5432
