@@ -47,6 +47,11 @@ dependencies {
     //-- Metricas Prometheus
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
 
+    //Kubernetes
+    implementation("io.quarkus:quarkus-kubernetes")
+    implementation("io.quarkus:quarkus-container-image-jib")
+
+
 }
 
 tasks.test {
