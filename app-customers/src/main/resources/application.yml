@@ -18,8 +18,9 @@ spring:
       discovery:
         enabled: true
         register: true
+        prefer-ip-address: true
         tags:
-          - framework=springboot-4.0.6
+          - framework=springboot-3.5.13
           - traefik.enable=true
           - traefik.http.routers.router-app-customers.rule=PathPrefix(`/app-customers`)
           - traefik.http.routers.router-app-customers.middlewares=middleware-customers
@@ -39,3 +40,9 @@ management:
     metrics:
       export:
         enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT_HTTP:http://localhost:4318/v1/traces}

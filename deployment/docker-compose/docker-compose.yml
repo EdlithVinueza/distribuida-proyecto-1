@@ -26,7 +26,7 @@ services:
       --api.dashboard=true
       --providers.consulCatalog
       --providers.consulCatalog.endpoint.address=consul:8500
-      --providers.consulCatalog.exposeByDefault=false
+      --providers.consulCatalog.exposedByDefault=false
       --providers.consulCatalog.refreshInterval=5s
     ports:
       - 8888:8080

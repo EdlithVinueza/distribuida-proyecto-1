@@ -47,6 +47,9 @@ dependencies {
     //-- Metricas Prometheus
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
 
+    //-- OpenTelemetry
+    implementation("io.quarkus:quarkus-opentelemetry")
+
     //Kubernetes
     implementation("io.quarkus:quarkus-kubernetes")
     implementation("io.quarkus:quarkus-container-image-jib")

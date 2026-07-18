@@ -12,6 +12,12 @@ import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
+import io.opentelemetry.instrumentation.annotations.SpanAttribute;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -21,14 +27,18 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final AuthorRestClient authorRestClient;
+    private final Tracer tracer;
 
     @Inject
-    public BookService(BookRepository bookRepository, @RestClient AuthorRestClient authorRestClient) {
+    public BookService(BookRepository bookRepository, @RestClient AuthorRestClient authorRestClient, Tracer tracer) {
         this.bookRepository = bookRepository;
         this.authorRestClient = authorRestClient;
+        this.tracer = tracer;
     }
 
-    public Optional<BookDto> findByIsbn(String isbn) {
+    @WithSpan("BookService.findByIsbn")
+    public Optional<BookDto> findByIsbn(@SpanAttribute("book.isbn") String isbn) {
+        Span.current().setAttribute("custom.operation", "find_book_by_isbn");
         return bookRepository.findByIdOptional(isbn).map(this::toDtoWithAuthorsSafe);
     }
 
@@ -47,13 +57,21 @@ public class BookService {
     }
 
     private BookDto toDtoWithAuthorsSafe(Book book) {
-        BookDto dto = toDtoBase(book);
-        try {
-            dto.setAuthors(authorRestClient.findByBook(book.getIsbn()));
-        } catch (WebApplicationException | ProcessingException ex) {
-            dto.setAuthors(List.of());
+        Span manualSpan = tracer.spanBuilder("fetch-authors-safely")
+                .setAttribute("book.isbn", book.getIsbn())
+                .startSpan();
+        try (Scope scope = manualSpan.makeCurrent()) {
+            BookDto dto = toDtoBase(book);
+            try {
+                dto.setAuthors(authorRestClient.findByBook(book.getIsbn()));
+            } catch (WebApplicationException | ProcessingException ex) {
+                manualSpan.recordException(ex);
+                dto.setAuthors(List.of());
+            }
+            return dto;
+        } finally {
+            manualSpan.end();
         }
-        return dto;
     }
 
     private BookDto toDtoWithAuthors(Book book) {
