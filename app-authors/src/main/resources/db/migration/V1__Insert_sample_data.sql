@@ -45,3 +45,25 @@ INSERT INTO books_authors (book_isbn, author_id) VALUES
 INSERT INTO customers (name, email) VALUES 
 ('Cliente Uno', 'cliente1@example.com'),
 ('Cliente Dos', 'cliente2@example.com');
+
+-- 6. Customer (singular)
+INSERT INTO customer (email, name, version) VALUES ('juan@example.com', 'Juan Pérez', 0);
+INSERT INTO customer (email, name, version) VALUES ('maria@example.com', 'María García', 0);
+INSERT INTO customer (email, name, version) VALUES ('carlos@example.com', 'Carlos López', 0);
+
+-- 7. Purchase Order
+INSERT INTO purchaseorder (customer_id, placedon, deliveredon, status, total, version) 
+VALUES (1, '2024-01-15 10:00:00', '2024-01-20 14:00:00', 1, 35, 0);
+
+INSERT INTO purchaseorder (customer_id, placedon, deliveredon, status, total, version) 
+VALUES (2, '2024-02-03 15:30:00', NULL, 0, 18, 0);
+
+INSERT INTO purchaseorder (customer_id, placedon, deliveredon, status, total, version) 
+VALUES (3, '2024-02-10 09:45:00', '2024-02-15 11:20:00', 1, 50, 0);
+
+-- 8. Line Items (mapped to ISBN-001, ISBN-002, ISBN-003)
+INSERT INTO lineitem (order_id, book_isbn, quantity, idx) VALUES (1, 'ISBN-001', 2, 0);
+INSERT INTO lineitem (order_id, book_isbn, quantity, idx) VALUES (2, 'ISBN-002', 1, 0);
+INSERT INTO lineitem (order_id, book_isbn, quantity, idx) VALUES (3, 'ISBN-003', 3, 0);
+INSERT INTO lineitem (order_id, book_isbn, quantity, idx) VALUES (3, 'ISBN-002', 1, 1);
+

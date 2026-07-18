@@ -42,11 +42,14 @@ services:
       QUARKUS_HTTP_PORT: 8080
       CONSUL_HOST: consul
       CONSUL_PORT: 8500
+
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+
     depends_on:
       - db-server
       - consul
       - jaeger
+      - zipkin
   books:
     build:
       context: ../../app-books
@@ -59,12 +62,15 @@ services:
       QUARKUS_HTTP_PORT: 8080
       CONSUL_HOST: consul
       CONSUL_PORT: 8500
+
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+
     depends_on:
       - db-server
       - consul
       - authors
       - jaeger
+      - zipkin
   customers:
     build:
       context: ../../app-customers
@@ -77,11 +83,14 @@ services:
       SPRING_DATASOURCE_PASSWORD: "labcom,2015"
       SPRING_CLOUD_CONSUL_HOST: consul
       SPRING_CLOUD_CONSUL_PORT: 8500
+
       OTEL_EXPORTER_OTLP_ENDPOINT_HTTP: http://jaeger:4318/v1/traces
+
     depends_on:
       - db-server
       - consul
       - jaeger
+      - zipkin
   web:
     build:
       context: ../../app-web
@@ -94,18 +103,17 @@ services:
       - books
       - customers
 
-  # Servidores de trazabilidad distribuidos sugeridos para esta tarea
   jaeger:
     image: jaegertracing/all-in-one:1.60
     container_name: jaeger-server
     ports:
-      - "16686:16686" # Interfaz Web de Jaeger
-      - "4317:4317"   # OTLP gRPC Receiver
-      - "4318:4318"   # OTLP HTTP Receiver
-      - "9411:9411"   # Envío en formato Zipkin
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "9411:9411"
 
   zipkin:
     image: openzipkin/zipkin:3.4
     container_name: zipkin-server
     ports:
-      - "9412:9411"   # Interfaz Web de Zipkin
+      - "9412:9411"

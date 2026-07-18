@@ -18,6 +18,7 @@ function App() {
 
   const [authors, setAuthors] = useState<Author[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
 
   const handleClicklistarAuthores = async (): Promise<void> => {
     try {
@@ -33,6 +34,15 @@ function App() {
     try {
       const response = await axios.get<Book[]>('/app-books/books');
       setBooks(response.data);
+    } catch (error) {
+      alert(String(error));
+    }
+  };
+
+  const handleClickListarCustomers = async (): Promise<void> => {
+    try {
+      const response = await axios.get<any[]>('/app-customers/customers');
+      setCustomers(response.data);
     } catch (error) {
       alert(String(error));
     }
@@ -81,6 +91,21 @@ function App() {
                                 ))}
                             </ul>
                         </ul>
+                ))
+            }
+        </section>
+
+        <section id="center">
+            <div>
+                <h1>Customers</h1>
+            </div>
+
+            <button onClick={handleClickListarCustomers}> Consultar </button>
+
+            <br />
+            {
+                customers.map((customer: any) => (
+                    <p key={customer.id}>{customer.id} - {customer.name} ({customer.email})</p>
                 ))
             }
         </section>

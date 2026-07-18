@@ -32,11 +32,14 @@ dependencyManagement {
 dependencies {
     // Bloque Spring Web, Discovery y Actuator heredando versiones automáticamente
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     //-- Registro y Descubrimiento con Consul
     implementation("org.springframework.cloud:spring-cloud-starter-consul-discovery")
+    implementation("org.springframework.cloud:spring-cloud-starter-consul-config")
 
     //-- Metricas Prometheus
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -45,6 +48,8 @@ dependencies {
     //-- OpenTelemetry Tracing
     implementation("io.micrometer:micrometer-tracing-bridge-otel")
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+
+    runtimeOnly("org.postgresql:postgresql")
 }
 
 
