@@ -55,7 +55,7 @@ public class BookLifecycle {
                     .setDeregisterAfter("10s");
             var tags= List.of(
                     "traefik.enable=true",
-                    "traefik.http.routers.app-books.rule=PathPrefix(`/app-books`)",
+                    "traefik.http.routers.router-app-books.rule=PathPrefix(`/app-books`)",
                     "traefik.http.routers.router-app-books.middlewares=middleware-books",
                     "traefik.http.middlewares.middleware-books.stripprefix.prefixes=/app-books"
             );

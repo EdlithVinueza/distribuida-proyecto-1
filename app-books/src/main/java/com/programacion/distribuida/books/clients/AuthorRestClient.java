@@ -9,7 +9,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import java.util.List;
 
-@Path("/authors")
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 //@RegisterRestClient(configKey = "AuthorRestClient")
@@ -17,10 +17,15 @@ import java.util.List;
 public interface AuthorRestClient {
 
     @GET
-    @Path("/find/{isbn}")
+    @Path("/authors/find/{isbn}")
     @Retry(maxRetries = 2, delay = 1000)
     @Fallback(fallbackMethod = "findByBookFallback")
     List<AuthorDto> findByBook(@PathParam("isbn") String isbn);
+
+    @GET
+    @Path("/ping")
+    @Produces(MediaType.TEXT_PLAIN)
+    String ping();
 
     // Método fallback por defecto si fallan los reintentos
     default List<AuthorDto> findByBookFallback(String isbn) {

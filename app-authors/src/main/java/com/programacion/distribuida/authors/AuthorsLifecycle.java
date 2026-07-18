@@ -62,7 +62,7 @@ public class AuthorsLifecycle {
             //las etiquetas venian priginalmente en app-static.yml de traefik
             var tags= List.of(
                     "traefik.enable=true",
-                    "traefik.http.routers.app-authors.rule=PathPrefix(`/app-authors`)",
+                    "traefik.http.routers.router-app-authors.rule=PathPrefix(`/app-authors`)",
                     "traefik.http.routers.router-app-authors.middlewares=middleware-authors",
                     "traefik.http.middlewares.middleware-authors.stripprefix.prefixes=/app-authors"
             );

@@ -46,6 +46,9 @@ dependencies {
     //-- OpenTelemetry
     implementation("io.quarkus:quarkus-opentelemetry")
 
+    //-- Health Checks
+    implementation("io.quarkus:quarkus-smallrye-health")
+
     //Kubernetes
     implementation("io.quarkus:quarkus-kubernetes")
     implementation("io.quarkus:quarkus-container-image-jib")
